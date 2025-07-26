@@ -9,6 +9,8 @@ export default function RecipeList() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [page, setPage] = useState(1);
+
   const navigate = useNavigate();
 
   const categories = [
@@ -40,11 +42,22 @@ export default function RecipeList() {
     return 'Other';
   }
 
+  // Filtering
   const filteredRecipes = recipes.filter(recipe => {
     const matchesSearch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || getRecipeCategory(recipe) === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Pagination logic
+  const cardsPerPage = 12;
+  const totalPages = Math.ceil(filteredRecipes.length / cardsPerPage);
+  const paginatedRecipes = filteredRecipes.slice((page - 1) * cardsPerPage, page * cardsPerPage);
+
+  // Reset to page 1 when filters/search change
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, selectedCategory]);
 
   if (loading) {
     return (
@@ -61,11 +74,7 @@ export default function RecipeList() {
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: "sans-serif" }}>
       {/* Hero Section with Video Background */}
       <section className="relative min-h-[500px] h-screen flex items-center justify-center overflow-hidden mb-10">
-        {/* Video Background */}
-        <video className="absolute inset-0 w-full h-full object-cover z-0" src="/heroo.mp4" autoPlay loop muted playsInline style={{ minHeight: '90%', height: '90%' }} />
-        {/* Overlay */}
-        {/* <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-orange-100 z-10"></div> */}
-        {/* Hero Content */}
+        <video className="absolute inset-0 w-full h-full object-cover z-0" src="/heroo.mp4" autoPlay loop muted playsInline style={{ minHeight: '100%', height: '100%' }} />
         <div className="relative z-20 w-full flex flex-col items-center justify-center text-center px-4 pt-40">
           <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4 tracking-tight drop-shadow-lg">
             Discover & Cook
@@ -76,8 +85,7 @@ export default function RecipeList() {
           <p className="text-l md:text-xl text-gray-500 mb-8 font-light drop-shadow">
             Find inspiration for your next meal.
           </p>
-          {/* Animated Scroll Arrow */}
-          <div className="flex items-center justify-center mt-8  ">
+          <div className="flex items-center justify-center mt-8">
             <button
               onClick={() => {
                 const resultsSection = document.getElementById('results-section');
@@ -85,8 +93,10 @@ export default function RecipeList() {
                   resultsSection.scrollIntoView({ behavior: 'smooth' });
                 }
               }}
-              className="bg-white/20 rounded-full shadow-lg p-2 hover:bg-orange-100 transition-colors flex items-center justify-center" aria-label="Scroll Down" >
-              <svg className="w-8 h-8 animate-bounce text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" >
+              className="bg-white/20 rounded-full shadow-lg p-2 hover:bg-orange-100 transition-colors flex items-center justify-center"
+              aria-label="Scroll Down"
+            >
+              <svg className="w-8 h-8 animate-bounce text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -95,7 +105,7 @@ export default function RecipeList() {
       </section>
 
       {/* Product List Section */}
-      <section id="results-section" className="max-w-7xl mx-auto px-4 py-12">
+      <section id="results-section" className="max-w-7xl mx-auto px-4 mb-20">
         {/* Search and Filter Header */}
         <div className="bg-white rounded-2xl shadow-sm p-8 mb-8 border border-gray-100">
           <div className="text-center mb-8">
@@ -133,7 +143,7 @@ export default function RecipeList() {
         </div>
 
         {/* Results Header */}
-        <div className="mb-8">
+        <div className="mb-8 mx-12 ">
           <h3 className="text-2xl font-bold text-gray-900 mb-2">
             {selectedCategory === 'All' ? 'All Recipes' : `${selectedCategory} Recipes`}
           </h3>
@@ -143,13 +153,13 @@ export default function RecipeList() {
         </div>
 
         {/* Recipe Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredRecipes.map((recipe, index) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mx-10">
+          {paginatedRecipes.map((recipe, index) => {
             const category = getRecipeCategory(recipe);
             return (
               <div
                 key={recipe.id}
-                className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer group overflow-hidden border border-gray-100"
+                className="bg-gray-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer group overflow-hidden border border-gray-100 flex flex-col h-full"
                 style={{
                   animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
                 }}
@@ -163,21 +173,38 @@ export default function RecipeList() {
                     </span>
                   </div>
                 </div>
-                <div className="p-5">
-                  <h4 className="font-semibold text-gray-900 leading-tight mb-4 group-hover:text-orange-600 transition-colors">
+                <div className="p-5 flex flex-col flex-1">
+                  <h4 className="font-semibold text-white leading-tight mb-4 ">
                     {recipe.title}
                   </h4>
-                  <button onClick={() => navigate(`/recipe/${recipe.id}`)} className="w-full bg-orange-500 text-white py-3 rounded-xl hover:bg-orange-600 transition-colors text-sm font-medium group-hover:bg-orange-400">
-                    View Recipe
-                  </button>
+                  <div className="mt-auto">
+                    <button onClick={() => navigate(`/recipe/${recipe.id}`)} className="w-full bg-orange-500 text-white py-3 rounded-xl hover:bg-orange-600 transition-colors text-sm font-medium group-hover:bg-orange-400">
+                      View Recipe
+                    </button>
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
 
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-10">
+            <button onClick={() => setPage(page - 1)} disabled={page === 1} className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-orange-100 disabled:opacity-50 disabled:cursor-not-allowed" >
+              Prev
+            </button>
+            <span className="text-gray-700 font-semibold">
+              Page {page} of {totalPages}
+            </span>
+            <button onClick={() => setPage(page + 1)} disabled={page === totalPages} className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-orange-100 disabled:opacity-50 disabled:cursor-not-allowed" >
+              Next
+            </button>
+          </div>
+        )}
+
         {/* Empty State */}
-        {filteredRecipes.length === 0 && (
+        {paginatedRecipes.length === 0 && (
           <div className="text-center py-8 ">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Search className="w-6 h-6 text-gray-400" />
@@ -206,12 +233,9 @@ export default function RecipeList() {
           }
         }
       `}</style>
-    {/* Simple Footer */}
-    <footer className="bg-white border-t border-gray-200 text-center py-4 mt-auto text-sm text-gray-500">
-      &copy; {new Date().getFullYear()} Recipe Book. Made by Deepanshu Patel.
-    </footer>
-
-
+      {/* Simple Footer */}
+      <footer className="bg-black border-t border-gray-200 text-center py-4 mt-auto text-sm text-gray-100">
+        &copy; {new Date().getFullYear()} Recipe Book. Made by Deepanshu Patel.
+      </footer>
     </div>
-  )
-}
+  )}
