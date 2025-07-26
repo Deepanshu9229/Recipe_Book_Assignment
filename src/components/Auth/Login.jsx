@@ -18,14 +18,14 @@ export default function Login() {
 
   return (
     <form className="max-w-md mx-auto mt-20 bg-white p-6 rounded shadow" onSubmit={handleLogin}>
-      <h2 className="text-2xl font-bold mb-4">Login / Signup</h2>
+      <h2 className="text-2xl font-bold mb-4">Enter Name to Rate & Add Favorite</h2>
       <input
         className="border rounded px-2 py-1 w-full mb-2"
         placeholder="Username"
         value={username}
         onChange={e => setUsername(e.target.value)}
       />
-      <button className="bg-red-500 text-white px-4 py-2 rounded w-full">Login</button>
+      <button className="bg-red-500 text-white px-4 py-2 rounded w-full">Enter</button>
     </form>
   );
 }
