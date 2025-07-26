@@ -4,7 +4,7 @@ import { fetchRecipeDetails } from '../api/spoonacular';
 import { toast } from 'react-toastify';
 import { ArrowLeft, Clock, Users, ChefHat, Heart, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 
 export default function RecipeDetail() {
@@ -14,21 +14,22 @@ export default function RecipeDetail() {
   const [checkedIngredients, setCheckedIngredients] = useState(new Set());
 
   const { user } = useAuth();
-const navigate = useNavigate();
-const [isFavorite, setIsFavorite] = useState(false);
-const [rating, setRating] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [rating, setRating] = useState(0);
 
-// Load rating from localStorage when recipe changes
-useEffect(() => {
-  if (recipe?.id) {
-    const storedRating = localStorage.getItem(`rating_${recipe.id}`);
-    if (storedRating) setRating(Number(storedRating));
-  }
-}, [recipe]);
-useEffect(() => {
-  const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
-  setIsFavorite(favs.includes(recipe?.id));
-}, [recipe]);
+  // Load rating from localStorage when recipe changes
+  useEffect(() => {
+    if (recipe?.id) {
+      const storedRating = localStorage.getItem(`rating_${recipe.id}`);
+      if (storedRating) setRating(Number(storedRating));
+    }
+  }, [recipe]);
+  useEffect(() => {
+    const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+    setIsFavorite(favs.includes(recipe?.id));
+  }, [recipe]);
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -45,30 +46,30 @@ useEffect(() => {
   }, [id]);
 
   const handleFavorite = () => {
-  if (!user) {
-    navigate('/login');
-    return;
-  }
-  const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
-  let updated;
-  if (favs.includes(recipe.id)) {
-    updated = favs.filter(id => id !== recipe.id);
-    setIsFavorite(false);
-  } else {
-    updated = [...favs, recipe.id];
-    setIsFavorite(true);
-  }
-  localStorage.setItem('favorites', JSON.stringify(updated));
-};
+    if (!user) {
+      navigate('/login', { state: { from: location.pathname } });
+      return;
+    }
+    const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+    let updated;
+    if (favs.includes(recipe.id)) {
+      updated = favs.filter(id => id !== recipe.id);
+      setIsFavorite(false);
+    } else {
+      updated = [...favs, recipe.id];
+      setIsFavorite(true);
+    }
+    localStorage.setItem('favorites', JSON.stringify(updated));
+  };
 
-const handleRating = (value) => {
-  if (!user) {
-    navigate('/login');
-    return;
-  }
-  setRating(value);
-  localStorage.setItem(`rating_${recipe.id}`, value);
-};
+  const handleRating = (value) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    setRating(value);
+    localStorage.setItem(`rating_${recipe.id}`, value);
+  };
 
   const toggleIngredient = (ingredientId) => {
     setCheckedIngredients(prev => {
@@ -80,7 +81,7 @@ const handleRating = (value) => {
 
   const dietaryTags = recipe ? [
     recipe.vegetarian && 'Vegetarian',
-    recipe.vegan && 'Vegan', 
+    recipe.vegan && 'Vegan',
     recipe.glutenFree && 'Gluten-Free',
     recipe.dairyFree && 'Dairy-Free',
     recipe.veryHealthy && 'Healthy'
@@ -129,30 +130,30 @@ const handleRating = (value) => {
           <div className="p-6  bg-gray-100">
             <div className="flex flex-col md:flex-row gap-6">
               <img src={recipe.image} alt={recipe.title} className="w-full md:w-1/3 h-64 md:h-80 object-cover rounded-lg" />
-              
+
               <div className="md:w-2/3">
                 <h1 className="text-3xl font-bold text-gray-900 mb-4">{recipe.title}</h1>
-                
-               <button
-  className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm mb-4 ${isFavorite ? 'bg-red-500 text-white' : 'bg-red-100 text-red-600'}`}
-  onClick={handleFavorite}
->
-  <Heart className="w-4 h-4" />
-  {isFavorite ? 'Saved' : 'Save'}
-</button>
 
-<div className="flex gap-1 mb-4">
-  {[1,2,3,4,5].map(n => (
-    <button
-      key={n}
-      onClick={() => handleRating(n)}
-      className={`w-8 h-8 flex items-center justify-center rounded-full ${rating >= n ? 'bg-yellow-400' : 'bg-gray-200'}`}
-    >
-      ★
-    </button>
-  ))}
-  <span className="ml-2 text-sm text-gray-600">{rating ? `You rated ${rating}` : 'Rate this recipe'}</span>
-</div>
+                <button
+                  className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm mb-4 ${isFavorite ? 'bg-red-500 text-white' : 'bg-red-100 text-red-600'}`}
+                  onClick={handleFavorite}
+                >
+                  <Heart className="w-4 h-4" />
+                  {isFavorite ? 'Saved' : 'Save'}
+                </button>
+
+                <div className="flex gap-1 mb-4">
+                  {[1, 2, 3, 4, 5].map(n => (
+                    <button
+                      key={n}
+                      onClick={() => handleRating(n)}
+                      className={`w-8 h-8 flex items-center justify-center rounded-full ${rating >= n ? 'bg-yellow-400' : 'bg-gray-200'}`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                  <span className="ml-2 text-sm text-gray-600">{rating ? `You rated ${rating}` : 'Rate this recipe'}</span>
+                </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4 mb-4">
@@ -236,8 +237,8 @@ const handleRating = (value) => {
                 <p className="text-sm text-gray-600">Community contributed recipe</p>
               </div>
               {recipe.sourceUrl && (
-                <a href={recipe.sourceUrl} target="_blank" rel="noopener noreferrer" 
-                   className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm">
+                <a href={recipe.sourceUrl} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm">
                   <ExternalLink className="w-4 h-4" />
                   View Original Recipe
                 </a>

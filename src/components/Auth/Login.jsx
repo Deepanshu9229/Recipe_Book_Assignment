@@ -1,18 +1,20 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Login() {
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (username) {
       login(username);
-      navigate('/');
+      const redirectTo = location.state?.from || "/" ;  // Redirect to previous page or home
+      navigate(redirectTo);
     }
   };
 
