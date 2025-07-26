@@ -82,7 +82,7 @@ export default function RecipeList() {
               <span className="text-red-500">Delicious Recipes</span>
             </div>
           </h1>
-          <p className="text-l md:text-xl text-gray-500 mb-8 font-light drop-shadow">
+          <p className="text-l md:text-xl text-gray-500 mb-5 font-light drop-shadow">
             Find inspiration for your next meal.
           </p>
           <div className="flex items-center justify-center mt-8">
