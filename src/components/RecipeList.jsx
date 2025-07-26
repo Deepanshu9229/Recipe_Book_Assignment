@@ -62,7 +62,7 @@ export default function RecipeList() {
       {/* Hero Section with Video Background */}
       <section className="relative min-h-[500px] h-screen flex items-center justify-center overflow-hidden mb-10">
         {/* Video Background */}
-        <video className="absolute inset-0 w-full h-full object-cover z-0" src="src\assets\heroo.mp4" autoPlay loop muted playsInline style={{ minHeight: '90%', height: '90%' }} />
+        <video className="absolute inset-0 w-full h-full object-cover z-0" src="/heroo.mp4" autoPlay loop muted playsInline style={{ minHeight: '90%', height: '90%' }} />
         {/* Overlay */}
         {/* <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-orange-100 z-10"></div> */}
         {/* Hero Content */}
