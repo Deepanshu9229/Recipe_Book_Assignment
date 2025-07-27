@@ -64,7 +64,7 @@ export default function RecipeDetail() {
 
   const handleRating = (value) => {
     if (!user) {
-      navigate('/login');
+      navigate('/login', {state: {from: location.pathname}});
       return;
     }
     setRating(value);
